@@ -37,7 +37,7 @@ public class KavyaUserdetailController {
 	}
 	
 	//for delete the user
-	@DeleteMapping("/deletinguser")
+	@DeleteMapping("/deletinguser/{usertoken}")
 	public ResponseEntity<?> deleteuser(@RequestParam String usertoken){
 	
 		return service.deleteUserDetail(usertoken);
@@ -45,7 +45,7 @@ public class KavyaUserdetailController {
 	}
 	
 	//for update the user
-	@PutMapping("/updatinguser")
+	@PutMapping("/updatinguser/{usertoken}")
 	public ResponseEntity<?> updateuser(@RequestParam String usertoken,@RequestBody KavyaUserdetail dto)
 	{
 		return service.updateUserDetail(usertoken, dto);
