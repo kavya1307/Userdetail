@@ -117,6 +117,30 @@ public class KavyaUserdetailDTO {
 				+ ", password=" + password + ", confirmpassword=" + confirmpassword + ", role=" + role
 				+ ", createdtime=" + createdtime + ", updatetime=" + updatetime + "]";
 	}
+	public KavyaUserdetailDTO(String usertoken, String firstname, String lastname, String email, String username,
+			String contact, String designation, String bloodgroup, String gender, String address, String password,
+			String confirmpassword, String role, String createdtime, String updatetime) {
+		super();
+		this.usertoken = usertoken;
+		this.firstname = firstname;
+		this.lastname = lastname;
+		this.email = email;
+		this.username = username;
+		this.contact = contact;
+		this.designation = designation;
+		this.bloodgroup = bloodgroup;
+		this.gender = gender;
+		this.address = address;
+		this.password = password;
+		this.confirmpassword = confirmpassword;
+		this.role = role;
+		this.createdtime = createdtime;
+		this.updatetime = updatetime;
+	}
+	public KavyaUserdetailDTO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 	
 	
 	

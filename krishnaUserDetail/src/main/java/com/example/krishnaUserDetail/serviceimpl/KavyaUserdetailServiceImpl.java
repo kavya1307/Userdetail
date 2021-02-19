@@ -1,5 +1,6 @@
 package com.example.krishnaUserDetail.serviceimpl;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -9,12 +10,15 @@ import java.util.Map;
 import java.util.Random;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.krishnaUserDetail.dto.KavyaUserdetailDTO;
+import com.example.krishnaUserDetail.logging.service.LoggingDetailService;
 import com.example.krishnaUserDetail.model.KavyaUserRespo;
 import com.example.krishnaUserDetail.model.KavyaUserdetail;
 import com.example.krishnaUserDetail.repository.KavyaUserdetailRepository;
@@ -26,58 +30,73 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 	@Autowired
 	KavyaUserdetailRepository repository;
 	@Autowired
-	KavyaUserRespo res;
+	 LoggingDetailService service;
+	
+	KavyaUserRespo res = new KavyaUserRespo();
+	
+	
 	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 	LocalDateTime ldt = LocalDateTime.now();
+
+	 static final Logger log = LoggerFactory.getLogger(KavyaUserdetailServiceImpl.class);
 
 	@Override
 	public ResponseEntity<?> createUserdetail(KavyaUserdetailDTO dto) {
 		
 		LinkedHashMap<String, Object> hashmap = new LinkedHashMap<String, Object>();
 
-		String regexp = "^[a-zA-Z]*$";
+		String regexp = "^[a-zA-Z]*$"; 
 		String firstname = dto.getFirstname();
 		if (null == firstname) {
 			hashmap.put("code", 400);
 			hashmap.put("message", "First Name is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 400, false, "Firstname is null.");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (firstname == "") {
 			hashmap.put("code", 400);
 			hashmap.put("message", "First Name is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 400, false, "Firstname is empty.");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		boolean firstNameValid = firstname.matches(regexp);
 
 		if (!(firstNameValid)) {
-			hashmap.put("code", 404);
+			hashmap.put("code", 400);
 			hashmap.put("message", "First Name has Only Alphabets.");
 			hashmap.put("status", false);
 			hashmap.put("firstName", firstname);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 400, false, "Firstname Not Valid.");
+
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 		String lastname = dto.getLastname();
 		if (null == lastname) {
-			hashmap.put("code", 404);
+			hashmap.put("code", 400);
 			hashmap.put("message", "Last Name is not Available.");
 			hashmap.put("status", false);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (lastname == "") {
-			hashmap.put("code", 404);
+			hashmap.put("code", 400);
 			hashmap.put("message", "Last Name is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 400, false, "Lastname is empty.");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		boolean lastNameValid = lastname.matches(regexp);
 
 		if (!(lastNameValid)) {
-			hashmap.put("code", 404);
+			hashmap.put("code", 400);
 			hashmap.put("message", "Last Name has Only Alphabets.");
 			hashmap.put("status", false);
-			hashmap.put("firstName", firstname);
+			hashmap.put("firstName", lastname);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 400, false, "Lastname Not Valid.");
+
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 
@@ -88,12 +107,16 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Email is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "Email is null.");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (email == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Email is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "Email is empty.");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 
@@ -104,6 +127,7 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("message", "Email is not Valid.");
 			hashmap.put("status", false);
 			hashmap.put("email", email);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "Email is empty.");
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 
@@ -113,6 +137,7 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Email is Already Exist.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "Email is not valid...");
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 
@@ -121,12 +146,14 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "UserName is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "username is null");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (username == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "UserName is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "username is empty");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 
@@ -136,6 +163,8 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "UserName is Already Exist.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "username is not username");
+
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 
@@ -146,12 +175,15 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Contact is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "contact is null");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (contact == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Contact is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "contact is empty");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 
@@ -162,6 +194,7 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("message", "Contact is not Valid.");
 			hashmap.put("status", false);
 			hashmap.put("contact", contact);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "contact is not valid");
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 
@@ -170,12 +203,15 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Designation is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "Designation is null");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (designation == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Designation is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "Designation is empty");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		String bloodgroup = dto.getBloodgroup();
@@ -183,12 +219,15 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Bloodgroup is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "bloodgroup is null..");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (bloodgroup == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Bloodgroup is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "bloodgroup is empty.");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		
@@ -197,12 +236,15 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Gender is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "gender is null..");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (gender == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Gender is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "gender is empty..");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		String address = dto.getAddress();
@@ -211,12 +253,15 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Address is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "Address is  null..");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (address == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Address is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "Address is  empty..");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 
@@ -227,24 +272,29 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Password is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "password is  empty..");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (null == password) {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Password is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "password is null..");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (null == confirmpassword) {
 			hashmap.put("code", 404);
 			hashmap.put("message", "ConfirmPassword is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "confirmpassword is  null..");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (confirmpassword == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "ConfirmPassword is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "confirmpassword is  empty..");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		boolean validpass = password.equals(confirmpassword);
@@ -253,6 +303,8 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("message", "Password and confirm password are not same");
 			hashmap.put("status", false);
 			hashmap.put("password", password);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "confirmpassword is  not valid..");
+
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 		String role = dto.getRole();
@@ -282,6 +334,7 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 		
 		dto.setUsertoken(generateRandom());
 		dto.setCreatedtime(dtf.format(ldt));
+		
 		ModelMapper mapper = new ModelMapper();
 		KavyaUserdetail model = mapper.map(dto, KavyaUserdetail.class);
 		LinkedHashMap<String, Object> map = new LinkedHashMap<>();
@@ -296,7 +349,11 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 		map.put("gender", model.getGender());
 		map.put("address", model.getAddress());
 		map.put("password", model.getPassword());
+		map.put("confirmpassword", model.getConfirmpassword());
 		map.put("role", model.getRole());	
+		
+		repository.save(model);
+		service.create("-", new Timestamp(System.currentTimeMillis()), 200, true, "user create..");
 		return ResponseEntity.ok(res.addMap(map));
 		}	
 		
@@ -319,7 +376,9 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 	public ResponseEntity<?> getAllUser() {
 		
 		List<KavyaUserdetail> listUser = repository.findAll();
-		return ResponseEntity.ok(res.getUseraddMap(listUser));	}
+		service.create("-", new Timestamp(System.currentTimeMillis()), 200, true, "get all user");
+		return ResponseEntity.ok(res.getUseraddMap(listUser));
+	}
 
 	@Override
 	public ResponseEntity<?> deleteUserDetail(String usertoken) {
@@ -330,11 +389,14 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "User is not Found.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "User is not Found");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 
 		}
 		repository.delete(kavya);
 		
+		service.create("-", new Timestamp(System.currentTimeMillis()), 200, true, "User deleted");
+
 		return ResponseEntity.ok(res.deleteUseraddMap(usertoken));
 	}
 
@@ -350,12 +412,16 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 400);
 			hashmap.put("message", "First Name is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 400, false, "Firstname is null.");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (firstname == "") {
 			hashmap.put("code", 400);
 			hashmap.put("message", "First Name is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 400, false, "Firstname is empty.");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		boolean firstNameValid = firstname.matches(regexp);
@@ -365,6 +431,8 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("message", "First Name has Only Alphabets.");
 			hashmap.put("status", false);
 			hashmap.put("firstName", firstname);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 400, false, "Firstname Not Valid.");
+
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 		String lastname = dto.getLastname();
@@ -372,12 +440,15 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Last Name is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 400, false, "Lastname is null.");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (lastname == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Last Name is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 400, false, "Lastname is empty.");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		boolean lastNameValid = lastname.matches(regexp);
@@ -386,7 +457,9 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Last Name has Only Alphabets.");
 			hashmap.put("status", false);
-			hashmap.put("firstName", firstname);
+			hashmap.put("lastname",lastname );
+			service.create("-", new Timestamp(System.currentTimeMillis()), 400, false, "Lastname Not Valid.");
+
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 
@@ -397,12 +470,16 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Email is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "Email is null.");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (email == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Email is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "Email is empty.");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 
@@ -413,6 +490,8 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("message", "Email is not Valid.");
 			hashmap.put("status", false);
 			hashmap.put("email", email);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "Email is not valid.");
+
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 
@@ -422,6 +501,8 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Email is Already Exist.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "Email is already exists.");
+
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 
@@ -430,12 +511,16 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "UserName is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "username is null.");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (username == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "UserName is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "username is empty");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 
@@ -445,6 +530,8 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "UserName is Already Exist.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "username is null");
+
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 
@@ -455,12 +542,16 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Contact is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "contact is null");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (contact == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Contact is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "contact is empty");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 
@@ -471,6 +562,8 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("message", "Contact is not Valid.");
 			hashmap.put("status", false);
 			hashmap.put("contact", contact);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "contact is not valid");
+
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 
@@ -479,12 +572,16 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Designation is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "designation is null");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (designation == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Designation is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "designation is empty");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		String bloodgroup = dto.getBloodgroup();
@@ -492,12 +589,16 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Bloodgroup is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "bloodgroup is null");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (bloodgroup == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Bloodgroup is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "bloodgroup is empty");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		
@@ -506,12 +607,16 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Gender is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "gender is null");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (gender == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Gender is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "gender is empty");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		String address = dto.getAddress();
@@ -520,12 +625,16 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Address is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "address is null");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (address == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Address is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "address is empty");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 
@@ -536,24 +645,32 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("code", 404);
 			hashmap.put("message", "Password is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "password is empty");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (null == password) {
 			hashmap.put("code", 404);
 			hashmap.put("message", "Password is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "password is null");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (null == confirmpassword) {
 			hashmap.put("code", 404);
 			hashmap.put("message", "ConfirmPassword is not Available.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "confirmpassword is null");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		if (confirmpassword == "") {
 			hashmap.put("code", 404);
 			hashmap.put("message", "ConfirmPassword is Empty.");
 			hashmap.put("status", false);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "confirmpassword is empty");
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(hashmap);
 		}
 		boolean validpass = password.equals(confirmpassword);
@@ -562,6 +679,8 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 			hashmap.put("message", "Password and confirm password are not same");
 			hashmap.put("status", false);
 			hashmap.put("password", password);
+			service.create("-", new Timestamp(System.currentTimeMillis()), 404, false, "password is not valid");
+
 			return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body(hashmap);
 		}
 		String role = dto.getRole();
@@ -590,9 +709,12 @@ public class KavyaUserdetailServiceImpl implements KavyaUserdetailService{
 		else {
 		
 		dto.setCreatedtime(dtf.format(ldt));
+		//dto.setUpdatetime(dtf.format(ldt));
 		ModelMapper mapper = new ModelMapper();
 		KavyaUserdetail model = mapper.map(dto, KavyaUserdetail.class);
 		repository.save(model);
+		service.create("-", new Timestamp(System.currentTimeMillis()), 200, true, "user updated.");
+
 		return ResponseEntity.ok(res.updateUseraddMap(model));
 		}	
 			}
