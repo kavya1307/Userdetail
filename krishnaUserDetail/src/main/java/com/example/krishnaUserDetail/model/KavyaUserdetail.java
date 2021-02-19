@@ -1,6 +1,8 @@
 package com.example.krishnaUserDetail.model;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 @Entity
@@ -8,7 +10,8 @@ import javax.persistence.Table;
 public class KavyaUserdetail {
 	
 	@Id
-	public String usertoken;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	
 	public String firstname;
 	public String lastname;
 	public String email;
@@ -19,11 +22,12 @@ public class KavyaUserdetail {
 	public String gender;
 	public String address;
 	public String password;
-
+	public String confirmpassword;
 	public String role;
 	public String createdtime;
 	public String updatetime;
-	
+	public String usertoken;
+
 	
 	public String getUsertoken() {
 		return usertoken;
@@ -91,6 +95,12 @@ public class KavyaUserdetail {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	public String getConfirmpassword() {
+		return confirmpassword;
+	}
+	public void setConfirmpassword(String confirmpassword) {
+		this.confirmpassword = confirmpassword;
+	}
 	public String getRole() {
 		return role;
 	}
@@ -114,15 +124,12 @@ public class KavyaUserdetail {
 		return "KavyaUserdetail [usertoken=" + usertoken + ", firstname=" + firstname + ", lastname=" + lastname
 				+ ", email=" + email + ", username=" + username + ", contact=" + contact + ", designation="
 				+ designation + ", bloodgroup=" + bloodgroup + ", gender=" + gender + ", address=" + address
-				+ ", password=" + password + ", role=" + role + ", createdtime=" + createdtime + ", updatetime="
-				+ updatetime + "]";
+				+ ", password=" + password + ", confirmpassword=" + confirmpassword + ", role=" + role
+				+ ", createdtime=" + createdtime + ", updatetime=" + updatetime + "]";
 	}
-	public String getConfirmpassword() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	
+
+
+
 	
 
 }
